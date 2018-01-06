@@ -1,0 +1,20 @@
+{
+  "name": "oled",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "i2c-bus": "^1.2.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.0",
+    "oled-font-5x7": "^1.0.0",
+    "oled-i2c-bus": "^1.0.10",
+    "serve-favicon": "~2.4.5"
+  }
+}
