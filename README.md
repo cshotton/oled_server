@@ -1,7 +1,7 @@
 # oled_server
 node.js server for drawing on the AdaFruit 128x64 OLED Bonnet for Raspberry Pi
 
-If you're experienced with node.js (Express.js) projects, the important stuff is in the routes/oled.js file. 
+If you're experienced with node.js (Express.js) projects, the important stuff is in the `routes/oled.js` file. 
 If you aren't so node.js savvy, then you should download the GitHub repository to your Raspberry Pi and enter 
 the following (assumes that you have node.js installed and oled_server downloaded to your pi user's home directory):
 
