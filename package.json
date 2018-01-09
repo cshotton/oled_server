@@ -1,11 +1,12 @@
 {
-  "name": "oled",
-  "version": "0.0.0",
+  "name": "oled_server",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "app-root-path": "*",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
@@ -15,6 +16,8 @@
     "morgan": "~1.9.0",
     "oled-font-5x7": "^1.0.0",
     "oled-i2c-bus": "^1.0.10",
+    "raspi": "*",
+    "raspi-gpio": "*",
     "serve-favicon": "~2.4.5"
   }
 }

@@ -2,7 +2,7 @@
 # call from /etc/rc.local:
 #  su pi -c '/home/pi/oled_server/bin/www &'
 #  su pi -c 'sh /home/pi/oled_server/rc.sh &'
-
+echo "starting oled server"
 sleep 10
 _IP=$(hostname -I) || true
 if [ "$_IP" ]; then

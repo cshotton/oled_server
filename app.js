@@ -5,9 +5,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-var oled = require('./routes/oled');
+const appRoot = require('app-root-path');
+var index = require(appRoot+'/routes/index');
+var users = require(appRoot+'/routes/users');
+var oled = require(appRoot+'/routes/oled');
+var buttons = require(appRoot+'/modules/buttons')
 
 var app = express();
 
@@ -44,5 +46,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+buttons.init();
 
 module.exports = app;
