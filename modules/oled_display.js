@@ -44,7 +44,7 @@ function drawPixel (pixelArray, updateNow) { // [[x,y,c],...]
 //-----------------------------------------------------------------
 
 function drawString (x, y, color, str) {
-    oled.setCursor (x, x);
+    oled.setCursor (x, y);
     oled.writeString (font, 1, str, color, true);            
 }
 
@@ -63,8 +63,8 @@ function drawLine (x0, y0, x1, y1, color) {
 
 //-----------------------------------------------------------------
 
-function startScroll (dir, startRow, stopRow) {
-    oled.startScroll (dir, startRow, stopRow);
+function startScroll (dirLR, startRow, stopRow) {
+    oled.startScroll (dirLR, startRow, stopRow);
 }
 
 
@@ -184,6 +184,7 @@ function fillCircle (x0, y0, r, color, immed) {
 
 
 module.exports = {
+    clearDisplay : clearScreen,
     clearScreen : clearScreen,
     dimDisplay : dimDisplay,
     invertDisplay : invertDisplay,
