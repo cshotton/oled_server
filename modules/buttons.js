@@ -6,6 +6,7 @@ var raspi = require ('raspi');
 var gpio = require('raspi-gpio');
 const appRoot = require('app-root-path');
 var screen = require (appRoot + '/modules/oled_display');
+const exec = require ('child_process').exec;
 
 const L_pin = 27 
 const R_pin = 23 
@@ -28,24 +29,24 @@ var testMenu = {
         'prev'  : null,
         'items' : [
                 {
-                    'msg' : 'Line One',
+                    'msg' : 'This is a test',
                     'action' : {
-                            'cmd' : '',
-                            'arg' : ''
+                            'cmd' : 'exec',
+                            'arg' : 'sh /share/oled_server/sh/test.sh'
                         }
                 },
                 {
-                    'msg' : 'Line Two',
+                    'msg' : 'IP Address',
                     'action' : {
-                            'cmd' : '',
-                            'arg' : ''
+                            'cmd' : 'exec',
+                            'arg' : 'sh /share/oled_server/sh/ip.sh'
                         }
                 },
                 {
-                    'msg' : 'Line Three',
+                    'msg' : 'System Info',
                     'action' : {
-                            'cmd' : '',
-                            'arg' : ''
+                            'cmd' : 'exec',
+                            'arg' : 'sh /share/oled_server/sh/uptime.sh'
                         }
                 },
                 {
@@ -75,7 +76,7 @@ function setMenuCursor (item) {
 //-----------------------------------------------------------------------
  
 function drawMenu (menu) {
-    screen.clearDisplay();
+    screen.clearScreen(0);
     if (menuTitleHeight) { //there is a title to draw
         //screen.fillRect (0,0,screenWidth-1,menuTitleHeight,1);
         screen.drawString (1, 0, 1, menu.title);    
@@ -130,6 +131,28 @@ function moveCursor (dir) {
 }
  
 //-----------------------------------------------------------------------
+
+function doMenuChoice (menu, item) {
+    switch (menu.items[item].action.cmd) {
+        case 'exec':
+            var arg = menu.items[item].action.arg;
+            console.log ("Running " + arg);
+            
+            var cmd = exec (arg, (error, stdout, stderr) => {
+                    if (error !== null) {
+                        console.log ("exec error: " + error);
+                    }
+                });
+            break;
+    
+        default:
+            console.log ('menu action not processed: ');
+    }
+
+}
+
+ 
+//-----------------------------------------------------------------------
  
 function handleButton (pin, val) {
         
@@ -142,7 +165,8 @@ function handleButton (pin, val) {
             break;
             
         case R_pin:
-            //screen.startScroll ('right', 0, 5);
+            if (val)
+                doMenuChoice (testMenu, currentMenuItem);
             break;
             
         case C_pin:
