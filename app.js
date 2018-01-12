@@ -47,6 +47,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-buttons.init();
+buttons.init(process.argv[2]);
 
 module.exports = app;

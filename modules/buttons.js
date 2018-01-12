@@ -24,48 +24,68 @@ const cursorIndent = 10;
 var pins = [L_pin, R_pin, C_pin, U_pin, D_pin, A_pin, B_pin];
 var buttons = [];
 
-var testMenu = {
-        'title' : 'Pick something',
-        'prev'  : null,
-        'items' : [
+var displayState = true;
+
+var currentMenu = {
+        "title" : "Internal Test Menu",
+        "prev"  : null,
+        "items" : [
                 {
-                    'msg' : 'This is a test',
-                    'action' : {
-                            'cmd' : 'exec',
-                            'arg' : 'sh /share/oled_server/sh/test.sh'
+                    "msg" : "test 1",
+                    "action" : {
+                            "cmd" : "exec",
+                            "arg" : "sh " + appRoot + "/sh/test.sh"
                         }
                 },
                 {
-                    'msg' : 'IP Address',
-                    'action' : {
-                            'cmd' : 'exec',
-                            'arg' : 'sh /share/oled_server/sh/ip.sh'
+                    "msg" : "test 2",
+                    "action" : {
+                            "cmd" : "",
+                            "arg" : ""
                         }
                 },
                 {
-                    'msg' : 'System Info',
-                    'action' : {
-                            'cmd' : 'exec',
-                            'arg' : 'sh /share/oled_server/sh/uptime.sh'
-                        }
-                },
-                {
-                    'msg' : 'Line Four',
-                    'action' : {
-                            'cmd' : '',
-                            'arg' : ''
-                        }
-                },
-                {
-                    'msg' : 'Line Five',
-                    'action' : {
-                            'cmd' : '',
-                            'arg' : ''
+                    "msg" : "test 3",
+                    "action" : {
+                            "cmd" : "",
+                            "arg" : ""
                         }
                 }
             ]
     };
     
+//-----------------------------------------------------------------------
+ 
+function loadFile(path, opts) {
+    const fs = require('fs'); //inside here because implementation may change and it's not used anywhere else
+    var data = "";
+    try {
+//		console.log ("loading file " + path);
+        data = fs.readFileSync(path, opts);
+//        console.log("loadFile completed. " + path);
+        return data;
+    } catch (err) {
+        console.log ("Error loadFile " + path + ": " + err);
+        console.log ("loadfile error: " + JSON.stringify (err));
+        return data;
+    }
+}
+
+//-----------------------------------------------------------------------
+ 
+function loadCurrentMenu (path) {
+	console.log ("loading currentMenu: " + path);
+	if (path !== undefined && path.length)
+		try {
+			var menu = JSON.parse (loadFile (path, null));
+			if (menu) {
+				currentMenu = menu;
+			}
+		} catch (err) {
+			console.log ("loadCurrentMenu error: " + JSON.stringify (err));
+		}
+}
+
 //-----------------------------------------------------------------------
  
 function setMenuCursor (item) {
@@ -84,7 +104,7 @@ function drawMenu (menu) {
     
     for (var i=0;i<menuItemCount; i++) {
         var y = menuTitleHeight + (i) * lineHeight;
-        console.log ("item: "+i+": "+menu.items[i].msg+" @"+y);
+//        console.log ("item: "+i+": "+menu.items[i].msg+" @"+y);
         screen.drawString (cursorIndent, y, 1, menu.items[i].msg);
     }
 }
@@ -106,7 +126,7 @@ function runMenu (menu) {
         menuTitleHeight = 0;
     }
     
-    console.log ("running menu: " + menu.title + "\nitem count: " + menuItemCount);
+//    console.log ("running menu: " + menu.title + "\nitem count: " + menuItemCount);
     
     drawMenu (menu);
     setMenuCursor (currentMenuItem);
@@ -136,7 +156,7 @@ function doMenuChoice (menu, item) {
     switch (menu.items[item].action.cmd) {
         case 'exec':
             var arg = menu.items[item].action.arg;
-            console.log ("Running " + arg);
+//            console.log ("Running " + arg);
             
             var cmd = exec (arg, (error, stdout, stderr) => {
                     if (error !== null) {
@@ -144,6 +164,12 @@ function doMenuChoice (menu, item) {
                     }
                 });
             break;
+            
+        case 'menu':
+			var arg = menu.items[item].action.arg;
+			loadCurrentMenu (arg);
+			runMenu (currentMenu);
+			break;
     
         default:
             console.log ('menu action not processed: ');
@@ -161,12 +187,13 @@ function handleButton (pin, val) {
     
     switch (pin) {
         case L_pin:
-            //screen.startScroll ('left', 0, 5);
+            if (val)
+                runMenu (currentMenu);
             break;
             
         case R_pin:
             if (val)
-                doMenuChoice (testMenu, currentMenuItem);
+                doMenuChoice (currentMenu, currentMenuItem);
             break;
             
         case C_pin:
@@ -187,8 +214,15 @@ function handleButton (pin, val) {
             break;
             
         case B_pin:
-            if (val)
-                runMenu (testMenu);
+            if (val) {
+                displayState = !displayState;
+                if (displayState) {
+                    screen.turnOnDisplay();
+                }
+                else {
+                    screen.turnOffDisplay();
+                }
+            }
             break;
             
         default:
@@ -207,19 +241,28 @@ function makeWatcher (pin) {
 
 //-----------------------------------------------------------------------
  
-function init () {
+function init (firstMenuPath) {
     raspi.init (() => {
         try {
             for (var i=0; i<pins.length; i++) {
-                console.log ("making GPIO" + pins[i])
+//                console.log ("making GPIO" + pins[i])
                 buttons[i] = new gpio.DigitalInput({
                     pin:'GPIO'+pins[i],
                     pullResistor: gpio.PULL_UP});
                 buttons[i].on ('change', makeWatcher (pins[i]));
             }
+            
+            //start the main menu
+            loadCurrentMenu (firstMenuPath);
+            screen.clearScreen(0);
+            screen.invertDisplay (1);
+            screen.invertDisplay (0);
+            screen.turnOffDisplay();
+            displayState = false;
+            runMenu (currentMenu);
         }
         catch (err) {
-            console.log ("buttons err: " + err)
+//            console.log ("buttons err: " + err)
         }
     });
 }
