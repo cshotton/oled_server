@@ -63,6 +63,27 @@ function drawLine (x0, y0, x1, y1, color) {
 
 //-----------------------------------------------------------------
 
+function drawBitmap (data) {
+    oled.drawBitmap (data);
+}
+
+//-----------------------------------------------------------------
+
+function drawPngFile (path, dither) {
+    var pngtolcd = require ('png-to-lcd');
+    try {
+        pngtolcd (path, dither, function (err, image) {
+            oled.buffer = image;
+            oled.update ();
+        })
+    }
+    catch (err) {
+        console.log ("drawPngFile err: " + err);
+    }
+}
+
+//-----------------------------------------------------------------
+
 function startScroll (dirLR, startRow, stopRow) {
     oled.startScroll (dirLR, startRow, stopRow);
 }
@@ -190,6 +211,8 @@ module.exports = {
     invertDisplay : invertDisplay,
     drawPixel : drawPixel,
     drawString : drawString,
+    drawBitmap : drawBitmap,
+    drawPngFile : drawPngFile,
     fillRect : fillRect,
     drawLine : drawLine,
     startScroll : startScroll,

@@ -25,6 +25,7 @@ var pins = [L_pin, R_pin, C_pin, U_pin, D_pin, A_pin, B_pin];
 var buttons = [];
 
 var displayState = true;
+var waitForButton = false;
 
 var currentMenu = {
         "title" : "Internal Test Menu",
@@ -182,8 +183,13 @@ function doMenuChoice (menu, item) {
  
 function handleButton (pin, val) {
         
-    //screen.fillRect (0,0,15,10,0);
-   // screen.drawString (1, 8, 0, pin+"");
+    if (waitForButton) { //this is the first button press before starting the menuItemCount
+        if (val) {
+            waitForButton = false;
+            runMenu (currentMenu);
+            return;
+        }
+    }
     
     switch (pin) {
         case L_pin:
@@ -241,7 +247,7 @@ function makeWatcher (pin) {
 
 //-----------------------------------------------------------------------
  
-function init (firstMenuPath) {
+function init (firstMenuPath, splashScreen) {
     raspi.init (() => {
         try {
             for (var i=0; i<pins.length; i++) {
@@ -255,11 +261,12 @@ function init (firstMenuPath) {
             //start the main menu
             loadCurrentMenu (firstMenuPath);
             screen.clearScreen(0);
-            screen.invertDisplay (1);
-            screen.invertDisplay (0);
-            screen.turnOffDisplay();
-            displayState = false;
-            runMenu (currentMenu);
+            if (splashScreen)
+                screen.drawPngFile (splashScreen, false);
+            displayState = true;
+            waitForButton = true;
+            
+//            runMenu (currentMenu);
         }
         catch (err) {
 //            console.log ("buttons err: " + err)
