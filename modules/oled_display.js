@@ -221,30 +221,12 @@ function fillCircle (x0, y0, r, color, immed) {
 }
 
 //-----------------------------------------------------------------
-// Global event handlers
-function terminationHandler (options, err) {
-    if (err) {
-        console.log ("terminationHandler: " + err); //this is a custom error object, not a standard one
-    }
 
-    if (options.cleanup) {
-        console.log ('Exiting...');
-        i2cBus.close();
-        process.exit();
-    }
-
-    if (options.exit) {
-	    logger.warn (`(Ctrl-C) ${version_info.name} terminating.`);
-        i2cBus.close();
-        process.exit();
-    }
+function shutdown () {
+    i2cBus.close();
 }
 
-// termination for any other reason
-process.on ('exit', terminationHandler.bind (null, {cleanup: true}));
-
-// control-C
-process.on( 'SIGINT', terminationHandler.bind (null, {exit:true}));
+//-----------------------------------------------------------------
 
 
 module.exports = {
@@ -264,5 +246,6 @@ module.exports = {
     turnOnDisplay : turnOnDisplay,
     turnOffDisplay : turnOffDisplay,
     drawCircle : drawCircle,
-    fillCircle : fillCircle
+    fillCircle : fillCircle,
+    shutdown : shutdown
 }
