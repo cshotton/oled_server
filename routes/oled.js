@@ -17,23 +17,28 @@ function doCommand (cmd) {
     };
     
     switch (cmd.cmd) {
-        case "drawstring":
-            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"drawstring","x":1,"y":10, "color" : 1, "str": "This is a test"}' 'http://etherpi.local:3000/oled'
-            screen.drawString (cmd.x-0, cmd.y-0, cmd.color-0, cmd.str);
+        case "setfont":
+            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"setfont","font":"oled_5x7", "size":2}' 'http://localhost:3000/oled'
+            screen.setFont (cmd.font, cmd.size);
             break;
             
-        case "fillrect":
-            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"fillrect","x0":1,"y0":10, "x1": 32, "y1":32, "color" : 1}' 'http://etherpi.local:3000/oled'
+            case "drawstring":
+                // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"drawstring","x":1,"y":10, "color" : 1, "str": "This is a test"}' 'http://localhost:3000/oled'
+                screen.drawString (cmd.x-0, cmd.y-0, cmd.color-0, cmd.str);
+                break;
+                
+            case "fillrect":
+            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"fillrect","x0":1,"y0":10, "x1": 32, "y1":32, "color" : 1}' 'http://localhost:3000/oled'
             screen.fillRect (cmd.x0-0, cmd.y0-0, cmd.x1-0, cmd.y1-0, cmd.color-0);
             break;
             
         case "drawline":
-            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"drawline","x0":1,"y0":10, "x1": 32, "y1":32, "color" : 1}' 'http://etherpi.local:3000/oled'
+            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"drawline","x0":1,"y0":10, "x1": 32, "y1":32, "color" : 1}' 'http://localhost:3000/oled'
             screen.drawLine (cmd.x0-0, cmd.y0-0, cmd.x1-0, cmd.y1-0, cmd.color-0);
             break;
             
         case "cleardisplay":
-            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"cleardisplay"}' 'http://etherpi.local:3000/oled'
+            // curl -XPOST -i -H "Content-type: application/json" -d '{"cmd":"cleardisplay"}' 'http://localhost:3000/oled'
             screen.clearDisplay (cmd.color?1:0);
             break;
             

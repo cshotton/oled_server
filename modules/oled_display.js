@@ -1,12 +1,17 @@
 // oled_screen.js
 "use strict";
+console.log ("loading oled_screen.js");
+
 const MODULE_NAME = "oled_display";
 
 var i2c = require('i2c-bus'),
     i2cBus = i2c.openSync(1),
     OLED = require('oled-i2c-bus');
 
-var font = require('oled-font-5x7');
+//var _font = require('oled-font-5x7');
+var FontPack = require ('oled-font-pack');
+var _font = FontPack.oled_5x7;
+var _size = 1;
  
 var opts = {
     width: 128,
@@ -43,9 +48,21 @@ function drawPixel (pixelArray, updateNow) { // [[x,y,c],...]
 
 //-----------------------------------------------------------------
 
+function setFont (fontName, size) {
+    try {
+        _font = FontPack [fontName] || FontPack.oled_5x7;
+        _size = size > 0 ? size : 1;
+    }
+    catch (err) {
+        console.log ("setFont error: no such font, " + fontName);
+    }
+}
+
+//-----------------------------------------------------------------
+
 function drawString (x, y, color, str) {
     oled.setCursor (x, y);
-    oled.writeString (font, 1, str, color, true);            
+    oled.writeString (_font, _size, str, color, true);            
 }
 
 //-----------------------------------------------------------------
@@ -203,6 +220,32 @@ function fillCircle (x0, y0, r, color, immed) {
         oled.update();
 }
 
+//-----------------------------------------------------------------
+// Global event handlers
+function terminationHandler (options, err) {
+    if (err) {
+        console.log ("terminationHandler: " + err); //this is a custom error object, not a standard one
+    }
+
+    if (options.cleanup) {
+        console.log ('Exiting...');
+        i2cBus.close();
+        process.exit();
+    }
+
+    if (options.exit) {
+	    logger.warn (`(Ctrl-C) ${version_info.name} terminating.`);
+        i2cBus.close();
+        process.exit();
+    }
+}
+
+// termination for any other reason
+process.on ('exit', terminationHandler.bind (null, {cleanup: true}));
+
+// control-C
+process.on( 'SIGINT', terminationHandler.bind (null, {exit:true}));
+
 
 module.exports = {
     clearDisplay : clearScreen,
@@ -210,6 +253,7 @@ module.exports = {
     dimDisplay : dimDisplay,
     invertDisplay : invertDisplay,
     drawPixel : drawPixel,
+    setFont : setFont,
     drawString : drawString,
     drawBitmap : drawBitmap,
     drawPngFile : drawPngFile,
